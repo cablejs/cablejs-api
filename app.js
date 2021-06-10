@@ -35,7 +35,7 @@ function readlineSync() {
 }
 
 api.post("/refresh", async (req, res) => {
-    console.log("repl.deploy" + req.body + req.get("Signature"));
+    console.log("repl.deploy" + JSON.stringify(req.body) + req.get("Signature"));
 
     const ret = {
         body: string,
