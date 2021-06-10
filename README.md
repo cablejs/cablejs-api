@@ -1,2 +1,2 @@
 # cablejs-api
-The JavaScript API that runs CableJS
+The Node.js API that runs CableJS
