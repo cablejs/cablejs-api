@@ -126,6 +126,23 @@ api.get("/v1/guilds/:id/members", authMiddleware, async (req, res) => {
     res.json(guild.members);
 });
 
+api.get("/v1/guilds/:gid/members/:uid", authMiddleware, async (req, res) => {
+    let gid = req.params.gid;
+    let uid = req.params.uid;
+
+    let db = client.db("cablejs");
+
+    let users = db.collection("users");
+    let guilds = db.collection("guilds");
+
+    let guild = await guilds.findOne({ gid: parseInt(gid) });
+
+    let guildMember = guild.members.find(guildMemberObj => guildMemberObj.user === parseInt(uid));
+    if (guildMember === undefined) return res.status(404).json({ status: "NOT_FOUND", message: "User was not found in guild" });
+    
+    res.json(guildMember);
+});
+
 api.get("/v1/guilds/:id/channels", authMiddleware, async (req, res) => {
     let gid = req.params.id;
 
@@ -164,7 +181,9 @@ api.get("/v1/channels/:id", authMiddleware, async (req, res) => {
 
     if (userInGuild === undefined) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
 
+    delete channel._id;
     delete channel.messages;
+
     res.json(channel);
 });
 
@@ -186,7 +205,7 @@ api.get("/v1/channels/:id/messages", authMiddleware, async (req, res) => {
         messageObj.author = realAuthor;
     }
 
-    res.json(messagesInChannel);
+    res.json(channel.messages);
 });
 
 api.post("/v1/channels/:id/messages", authMiddleware, async (req, res) => {
