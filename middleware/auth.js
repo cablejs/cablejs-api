@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
 
         try
         {
-            req.cableAuth = jwt.verify(token, "c463f09ef65b44ca3a1f");
+            req.cableAuth = jwt.verify(token, process.env.JWT_SECRET);
         }
         catch (e)
         {
