@@ -41,14 +41,19 @@ api.post("/v1/auth/login", async (req, res) => {
 
             if (ret)
             {
-                let token = jwt.sign({
+                let data = {
                     uid: user.id,
+                    apiVersion: "v1",
                     signedAt: Date.now()
-                }, process.env.JWT_SECRET, {
+                };
+
+                let token = jwt.sign(data, process.env.JWT_SECRET, {
                     expiresIn: "30m"
                 });
 
-                res.json({ status: "OK", token: token });
+                let refreshToken = jwt.sign(data, process.env.JWT_REFRESH_SECRET);
+
+                res.json({ status: "OK", token: token, refreshToken: refreshToken });
             }
             else
             {
