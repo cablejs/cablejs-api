@@ -226,6 +226,14 @@ api.get("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
     res.json(message);
 });
 
+api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
+    let cid = req.params.cid;
+    let mid = req.params.mid;
+
+    let db = client.db("cablejs");
+    let channels = db.collection("channels");
+});
+
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
     let cid = req.params.cid;
     let mid = req.params.mid;
