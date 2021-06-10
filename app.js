@@ -22,6 +22,30 @@ const client = new MongoClient(process.env.DB_URI, {
 
 const authMiddleware = require("./middleware/auth");
 
+process.stdin.setEncoding('utf8');
+
+function readlineSync() {
+    return new Promise((resolve, reject) => {
+        process.stdin.resume();
+        process.stdin.on('data', function (data) {
+            process.stdin.pause();
+            resolve(data);
+        });
+    });
+}
+
+api.post("/refresh", async (req, res) => {
+    console.log("repl.deploy" + req.body + req.get("Signature"));
+
+    const ret = {
+        body: string,
+        status: number
+    } = JSON.parse(await readlineSync());
+
+    await res.status(ret.status).end(ret.body);
+    console.log("repl.deploy-success");
+});
+
 // Auth endpoints
 
 api.post("/v1/auth/login", async (req, res) => {
@@ -65,6 +89,12 @@ api.post("/v1/auth/login", async (req, res) => {
     {
         res.status(400).json({ status: "BAD_REQUEST" });
     }
+});
+
+let refreshTokens = [];
+
+api.post("/v1/auth/refresh", async (req, res) => {
+
 });
 
 // Guild endpoints
