@@ -44,7 +44,9 @@ api.post("/v1/auth/login", async (req, res) => {
                 let token = jwt.sign({
                     uid: user.id,
                     signedAt: Date.now()
-                }, process.env.JWT_SECRET);
+                }, process.env.JWT_SECRET, {
+                    expiresIn: "30m"
+                });
 
                 res.json({ status: "OK", token: token });
             }
