@@ -287,6 +287,8 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
     let db = client.db("cablejs");
     let channels = db.collection("channels");
     let users = db.collection("users");
+
+    let channel = await channels.findOne({ id: parseInt(cid) });
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
