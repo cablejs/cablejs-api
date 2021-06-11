@@ -1,4 +1,4 @@
-// Copyright (c) 2021 EmeraldSys Media Ltd - OSL-3.0
+// Copyright (c) 2021 EmeraldSys Media Ltd, All Rights Reserved
 
 require("dotenv").config();
 
@@ -284,6 +284,16 @@ api.get("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
 
 api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
     // Todo: Check author and edit
+
+    let cid = req.params.cid;
+    let mid = req.params.mid;
+
+    let db = client.db("cablejs");
+
+    let channels = db.collection("channels");
+    let users = db.collection("users");
+
+    
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
