@@ -48,6 +48,8 @@ api.post("/refresh", textMiddleware, async (req, res) => {
     console.log("repl.deploy-success");
 });
 
+let refreshTokens = [];
+
 // Auth endpoints
 
 api.post("/v1/auth/login", async (req, res) => {
@@ -92,7 +94,9 @@ api.post("/v1/auth/login", async (req, res) => {
     }
 });
 
-let refreshTokens = [];
+api.delete("/v1/auth/logout", authMiddleware, async (req, res) => {
+
+});
 
 api.post("/v1/auth/refresh", async (req, res) => {
     let refreshToken = req.body.refreshToken;
