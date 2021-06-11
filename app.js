@@ -378,6 +378,10 @@ api.get("/v1/users/:id/profile", authMiddleware, async (req, res) => {
 
 // ----------------------------------------------------------------------
 
+api.get("*", (_, res) => {
+    res.status(404).json({ status: "NOT_FOUND" });
+});
+
 api.listen(3000, () => {
     console.log("Ready");
     try
