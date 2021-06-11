@@ -95,7 +95,7 @@ api.post("/v1/auth/login", async (req, res) => {
 let refreshTokens = [];
 
 api.post("/v1/auth/refresh", async (req, res) => {
-
+    let refreshToken = req.body.refreshToken;
 });
 
 // Guild endpoints
