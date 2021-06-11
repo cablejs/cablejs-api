@@ -69,8 +69,7 @@ api.post("/v1/auth/login", async (req, res) => {
             {
                 let data = {
                     uid: user.id,
-                    apiVersion: "v1",
-                    signedAt: Date.now()
+                    apiVersion: "v1"
                 };
 
                 let token = jwt.sign(data, process.env.JWT_SECRET, {
