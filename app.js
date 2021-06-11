@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //const cookieParser = require("cookie-parser");
 
-api.use(express.json());
+api.use(express.text());
 //api.use(cookieParser());
 api.use((req, res, next) => {
     console.log("%s requested at %s", req.path, new Date());
@@ -37,7 +37,7 @@ function readlineSync() {
 }
 
 api.post("/refresh", async (req, res) => {
-    console.log("repl.deploy" + JSON.stringify(req.body) + req.get("Signature"));
+    console.log("repl.deploy" + req.body + req.get("Signature"));
 
     let line = await readlineSync();
     console.log(line);
