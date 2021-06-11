@@ -37,10 +37,10 @@ function readlineSync() {
 api.post("/refresh", async (req, res) => {
     console.log("repl.deploy" + JSON.stringify(req.body) + req.get("Signature"));
 
-    const ret = {
-        body: string,
-        status: number
-    } = JSON.parse(await readlineSync());
+    let line = await readlineSync();
+    console.log(line);
+
+    let ret = JSON.parse(line);
 
     await res.status(ret.status).end(ret.body);
     console.log("repl.deploy-success");
