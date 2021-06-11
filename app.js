@@ -9,8 +9,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //const cookieParser = require("cookie-parser");
 
-api.use(express.text());
+api.use(express.json());
 //api.use(cookieParser());
+const textMiddleware = require("plaintextparser");
+
 api.use((req, res, next) => {
     console.log("%s requested at %s", req.path, new Date());
     next();
@@ -36,8 +38,8 @@ function readlineSync() {
     });
 }
 
-api.post("/refresh", async (req, res) => {
-    console.log("repl.deploy" + req.body + req.get("Signature"));
+api.post("/refresh", textMiddleware, async (req, res) => {
+    console.log("repl.deploy" + req.text + req.get("Signature"));
 
     let line = await readlineSync();
     console.log(line);
