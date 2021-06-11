@@ -1,4 +1,4 @@
-// aaaaaa
+// Copyright (c) 2021 EmeraldSys Media Ltd - OSL-3.0
 
 require("dotenv").config();
 
@@ -7,10 +7,8 @@ const api = express();
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-//const cookieParser = require("cookie-parser");
 
 api.use(express.json());
-//api.use(cookieParser());
 const textMiddleware = require("plaintextparser");
 
 api.use((req, res, next) => {
