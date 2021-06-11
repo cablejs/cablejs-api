@@ -376,7 +376,7 @@ api.get("/v1/users/:id/profile", authMiddleware, async (req, res) => {
 
 // ----------------------------------------------------------------------
 
-api.listen(80, () => {
+api.listen(3000, () => {
     console.log("Ready");
     try
     {
