@@ -283,38 +283,11 @@ api.get("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
 });
 
 api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
-    let cid = req.params.cid;
-    let mid = req.params.mid;
-
-    let db = client.db("cablejs");
-    let channels = db.collection("channels");
-    let users = db.collection("users");
-
-    let channel = await channels.findOne({ id: parseInt(cid) });
+    // Todo: Check author and edit
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
-    let cid = req.params.cid;
-    let mid = req.params.mid;
-
-    let db = client.db("cablejs");
-    let channels = db.collection("channels");
-
-    // let channel = await channels.findOne({ id: parseInt(cid) });
-
-    // let message = channel.messages.find(messageObj => messageObj.id === parseInt(mid));
-    // if (message === undefined) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in specified channel" });
-
-    let ret = await channels.findOneAndUpdate({ id: parseInt(cid) }, {
-        $pull: {
-            messages: {
-                id: parseInt(mid)
-            }
-        }
-    });
-
-    console.log(ret);
-    res.status(204).end();
+    // Todo: Check author and delete
 });
 
 // User endpoints
