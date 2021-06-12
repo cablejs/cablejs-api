@@ -96,10 +96,13 @@ api.delete("/v1/auth/logout", authMiddleware, async (req, res) => {
     let db = client.db("cablejs");
     let invalidTokens = db.collection("invalidTokens");
 
-    await invalidTokens.insertOne({
+    let ret = await invalidTokens.insertOne({
         expiresAt: new Date(Math.round(accessTokenExp * 1000)),
         token: req.cableAuth.rawToken
     });
+
+    console.log(ret);
+    res.status(204).end();
 });
 
 // Guild endpoints
@@ -179,7 +182,7 @@ api.get("/v1/guilds/:gid/members/:uid", authMiddleware, async (req, res) => {
 
     let guildMember = guild.members.find(guildMemberObj => guildMemberObj.user === parseInt(uid));
     if (guildMember === undefined) return res.status(404).json({ status: "NOT_FOUND", message: "User was not found in guild" });
-    
+
     res.json(guildMember);
 });
 
@@ -296,7 +299,7 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
     let channels = db.collection("channels");
     let users = db.collection("users");
 
-    
+
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
@@ -331,7 +334,7 @@ api.get("/v1/users/@me/guilds", authMiddleware, async (req, res) => {
     let users = db.collection("users");
 
     let user = await users.findOne({ id: req.cableAuth.uid });
-    
+
     res.json(user.guilds);
 });
 
@@ -344,7 +347,7 @@ api.get("/v1/users/:id", authMiddleware, async (req, res) => {
     let user = await users.findOne({ id: parseInt(uid) });
     delete user.password;
 
-    res.json(user);    
+    res.json(user);
 });
 
 api.get("/v1/users/:id/profile", authMiddleware, async (req, res) => {
