@@ -96,6 +96,10 @@ api.delete("/v1/auth/logout", authMiddleware, async (req, res) => {
     let db = client.db("cablejs");
     let invalidTokens = db.collection("invalidTokens");
 
+    let invalidTokenObj = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+
+    if (invalidTokenObj) return res.status(400).json({ status: "BAD_REQUEST", message: "Session is already invalidated" });
+
     let ret = await invalidTokens.insertOne({
         expiresAt: new Date(Math.round(accessTokenExp * 1000)),
         token: req.cableAuth.rawToken
