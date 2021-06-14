@@ -36,6 +36,7 @@ function readlineSync() {
     });
 }
 
+// Remove this if you are deploying somewhere else other than Repl.it
 api.post("/refresh", textMiddleware, async (req, res) => {
     console.log("repl.deploy" + req.text + req.get("Signature"));
 
