@@ -453,6 +453,10 @@ api.get("/v1/admin/getInvalidatedTokens", authMiddleware, async (req, res) => {
     let invalidTokens = db.collection("invalidTokens");
     invalidTokens.find().toArray((err, ret) => {
         if (err) throw err;
+
+        ret.forEach(invalidTokenObj => {
+            delete invalidTokenObj._id;
+        });
         res.json(ret);
     });
 });
