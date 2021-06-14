@@ -440,6 +440,23 @@ api.get("/v1/users/:id/profile", authMiddleware, async (req, res) => {
     });
 });
 
+// Staff endpoints
+
+api.get("/v1/admin/getInvalidatedTokens", authMiddleware, async (req, res) => {
+    let db = client.db("cablejs");
+    let users = db.collection("users");
+
+    let userRequesting = await users.findOne({ id: parseInt(req.cableAuth.uid) });
+
+    if (!userRequesting.staff) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+
+    let invalidTokens = db.collection("invalidTokens");
+    invalidTokens.find().toArray((err, ret) => {
+        if (err) throw err;
+        res.json(ret);
+    });
+});
+
 // ----------------------------------------------------------------------
 
 api.get("*", (_, res) => {
