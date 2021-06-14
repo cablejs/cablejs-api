@@ -76,7 +76,15 @@ api.post("/v1/auth/login", async (req, res) => {
                     expiresIn: "30m"
                 });
 
-                res.json({ status: "OK", token: token });
+                let refreshData = {
+                    uid: user.id,
+                    token: token,
+                    apiVersion: "v1"
+                };
+
+                let refreshToken = jwt.sign(refreshData, process.env.JWT_REFRESH_SECRET);
+
+                res.json({ status: "OK", token: token, refreshToken: refreshToken });
             }
             else
             {
