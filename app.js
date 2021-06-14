@@ -115,7 +115,12 @@ api.post("/v1/guilds", authMiddleware, async (req, res) => {
     if (!req.body.name || typeof req.body.name != "string") return res.status(400).json({ status: "BAD_REQUEST" });
 
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let guilds = db.collection("guilds");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let ret = await guilds.insertOne({
         gid: Math.floor(Math.random() * (Math.floor(100000) - Math.ceil(1) + 1)) + 1,
@@ -142,7 +147,12 @@ api.get("/v1/guilds/:id", authMiddleware, async (req, res) => {
     let withCounts = req.query.withCounts === "true";
 
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let guilds = db.collection("guilds");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let guild = await guilds.findOne({ gid: parseInt(gid) });
 
@@ -157,8 +167,12 @@ api.get("/v1/guilds/:id/members", authMiddleware, async (req, res) => {
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
     let guilds = db.collection("guilds");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let guild = await guilds.findOne({ gid: parseInt(gid) });
 
@@ -179,8 +193,12 @@ api.get("/v1/guilds/:gid/members/:uid", authMiddleware, async (req, res) => {
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
     let guilds = db.collection("guilds");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let guild = await guilds.findOne({ gid: parseInt(gid) });
 
@@ -195,8 +213,12 @@ api.get("/v1/guilds/:id/channels", authMiddleware, async (req, res) => {
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let guilds = db.collection("guilds");
     let channels = db.collection("channels");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let guild = await guilds.findOne({ gid: parseInt(gid) });
 
@@ -218,8 +240,12 @@ api.get("/v1/channels/:id", authMiddleware, async (req, res) => {
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let guilds = db.collection("guilds");
     let channels = db.collection("channels");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let channel = await channels.findOne({ id: parseInt(cid) });
     let guild = await guilds.findOne({ gid: channel.gid });
@@ -239,8 +265,12 @@ api.get("/v1/channels/:id/messages", authMiddleware, async (req, res) => {
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
     let channels = db.collection("channels");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let channel = await channels.findOne({ id: parseInt(cid) });
 
@@ -260,7 +290,11 @@ api.post("/v1/channels/:id/messages", authMiddleware, async (req, res) => {
     let body = req.body;
 
     let db = client.db("cablejs");
+    let invalidTokens = db.collection("invalidTokens");
     let channels = db.collection("channels");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     // Use the $push operator to push a new message object into the array
     let ret = await channels.findOneAndUpdate({ id: parseInt(cid) }, {
@@ -282,7 +316,12 @@ api.get("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
     let mid = req.params.mid;
 
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let channels = db.collection("channels");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let channel = await channels.findOne({ id: parseInt(cid) });
 
@@ -300,10 +339,12 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
 
     let db = client.db("cablejs");
 
+    let invalidTokens = db.collection("invalidTokens");
     let channels = db.collection("channels");
     let users = db.collection("users");
 
-
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
@@ -325,7 +366,12 @@ api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =
 
 api.get("/v1/users/@me", authMiddleware, async (req, res) => {
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let user = await users.findOne({ id: req.cableAuth.uid });
     delete user.password;
@@ -335,7 +381,12 @@ api.get("/v1/users/@me", authMiddleware, async (req, res) => {
 
 api.get("/v1/users/@me/guilds", authMiddleware, async (req, res) => {
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let user = await users.findOne({ id: req.cableAuth.uid });
 
@@ -346,7 +397,12 @@ api.get("/v1/users/:id", authMiddleware, async (req, res) => {
     let uid = req.params.id;
 
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let user = await users.findOne({ id: parseInt(uid) });
     delete user.password;
@@ -358,7 +414,12 @@ api.get("/v1/users/:id/profile", authMiddleware, async (req, res) => {
     let uid = req.params.id;
 
     let db = client.db("cablejs");
+
+    let invalidTokens = db.collection("invalidTokens");
     let users = db.collection("users");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
     let user = await users.findOne({ id: parseInt(uid) });
 
