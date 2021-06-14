@@ -302,7 +302,8 @@ api.post("/v1/channels/:id/messages", authMiddleware, async (req, res) => {
             messages: {
                 id: Math.floor(Math.random() * (Math.floor(100000) - Math.ceil(1) + 1)) + 1,
                 author: req.cableAuth.uid,
-                content: body.content
+                content: body.content,
+                timestamp: new Date()
             }
         }
     });
