@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const express = require("express");
 const api = express();
-const cors = require("cors");
+const cors = require("./middleware/cors");
 
 api.use(express.json());
 const textMiddleware = require("plaintextparser");
