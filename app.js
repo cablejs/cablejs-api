@@ -50,7 +50,7 @@ api.post("/refresh", textMiddleware, async (req, res) => {
 
 // Auth endpoints
 
-api.post("/v1/auth/login", cors(), async (req, res) => {
+api.post("/v1/auth/login", cors, async (req, res) => {
     if (!req.body.login || !req.body.password) return res.status(400).json({ status: "BAD_REQUEST" });
 
     let db = client.db("cablejs");
