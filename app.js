@@ -12,6 +12,7 @@ api.use((req, res, next) => {
     console.log("%s requested at %s", req.path, new Date());
     next();
 });
+api.use(cors);
 
 const { MongoClient } = require("mongodb");
 const client = new MongoClient(process.env.DB_URI, {
@@ -50,7 +51,7 @@ api.post("/refresh", textMiddleware, async (req, res) => {
 
 // Auth endpoints
 
-api.post("/v1/auth/login", cors, async (req, res) => {
+api.post("/v1/auth/login", async (req, res) => {
     if (!req.body.login || !req.body.password) return res.status(400).json({ status: "BAD_REQUEST" });
 
     let db = client.db("cablejs");
