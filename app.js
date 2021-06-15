@@ -4,13 +4,10 @@ require("dotenv").config();
 
 const express = require("express");
 const api = express();
-
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 api.use(express.json());
 const textMiddleware = require("plaintextparser");
-
 api.use((req, res, next) => {
     console.log("%s requested at %s", req.path, new Date());
     next();
@@ -22,6 +19,8 @@ const client = new MongoClient(process.env.DB_URI, {
     useUnifiedTopology: true
 });
 
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const authMiddleware = require("./middleware/auth");
 
 process.stdin.setEncoding('utf8');
@@ -51,7 +50,7 @@ api.post("/refresh", textMiddleware, async (req, res) => {
 
 // Auth endpoints
 
-api.post("/v1/auth/login", async (req, res) => {
+api.post("/v1/auth/login", cors(), async (req, res) => {
     if (!req.body.login || !req.body.password) return res.status(400).json({ status: "BAD_REQUEST" });
 
     let db = client.db("cablejs");
