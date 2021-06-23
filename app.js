@@ -381,16 +381,26 @@ api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =
 
     let guilds = db.collection("guilds");
     let channels = db.collection("channels");
-    let users = db.collection("users");
 
     let channel = await channels.findOne({ id: parseInt(cid) });
 
-    if (channel)
-    {
-        let guild = await guilds.findOne({ gid: channel.gid });
-        if (guild)
-        {}
-    }
+    if (!channel) return res.status(404).json({ status: "NOT_FOUND", message: "Channel not found" });
+    let guild = await guilds.findOne({ gid: channel.gid });
+    if (!guild) return res.status(404).json({ status: "NOT_FOUND", message: "Guild not found" });
+    if (guild.members.find(guildMemberObj => guildMemberObj.user === req.cableAuth.uid) === undefined) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+
+    let channelMessage = channel.messages.find(channelMessageObj => channelMessageObj.id === parseInt(mid));
+    if (!channelMessage) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in channel" });
+
+    let ret = await channels.updateOne({ id: parseInt(cid) }, {
+        $pull: {
+            messages: {
+                id: parseInt(mid)
+            }
+        }
+    });
+
+    res.status(204).end();
 });
 
 // User endpoints
