@@ -375,6 +375,22 @@ api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =
     let db = client.db("cablejs");
 
     let invalidTokens = db.collection("invalidTokens");
+
+    let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
+    if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
+
+    let guilds = db.collection("guilds");
+    let channels = db.collection("channels");
+    let users = db.collection("users");
+
+    let channel = await channels.findOne({ id: parseInt(cid) });
+
+    if (channel)
+    {
+        let guild = await guilds.findOne({ gid: channel.gid });
+        if (guild)
+        {}
+    }
 });
 
 // User endpoints
