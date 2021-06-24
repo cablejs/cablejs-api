@@ -377,7 +377,7 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
     let channelMessage = channel.messages.find(channelMessageObj => channelMessageObj.id === parseInt(mid));
     if (!channelMessage) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in channel" });
 
-    if (channelMessage.author != req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+    if (channelMessage.author !== req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
 
     let ret = await channels.updateOne({ "messages.id": parseInt(mid) }, {
         $set: {
@@ -414,7 +414,7 @@ api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =
     let channelMessage = channel.messages.find(channelMessageObj => channelMessageObj.id === parseInt(mid));
     if (!channelMessage) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in channel" });
 
-    if (channelMessage.author != req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+    if (channelMessage.author !== req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
 
     let ret = await channels.updateOne({ id: parseInt(cid) }, {
         $pull: {
