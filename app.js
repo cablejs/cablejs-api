@@ -464,11 +464,21 @@ api.get("/v1/users/@me/guilds", authMiddleware, async (req, res) => {
     let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
     if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
-    let users = db.collection("users");
+    let guilds = db.collection("guilds");
 
-    let user = await users.findOne({ id: req.cableAuth.uid });
+    let allGuilds = await guilds.find().toArray();
 
-    res.json(user.guilds);
+    let memberGuilds = [];
+
+    allGuilds.forEach(guild => {
+        if (guild.members.find(guildMemberObj => guildMemberObj.user === req.cableAuth.uid) !== undefined)
+        {
+            delete guild.members;
+            memberGuilds.push(guild);
+        }
+    });
+
+    res.json(memberGuilds);
 });
 
 api.delete("/v1/users/@me/guilds/:gid", authMiddleware, async (req, res) => {
