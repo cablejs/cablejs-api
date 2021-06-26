@@ -358,6 +358,8 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
     let cid = req.params.cid;
     let mid = req.params.mid;
 
+    let newContent = typeof req.body.content == "string" ? req.body.content : "";
+
     let db = client.db("cablejs");
 
     let invalidTokens = db.collection("invalidTokens");
@@ -365,8 +367,28 @@ api.patch("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =>
     let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
     if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
+    let guilds = db.collection("guilds");
     let channels = db.collection("channels");
-    let users = db.collection("users");
+
+    let channel = await channels.findOne({ id: parseInt(cid) });
+
+    if (!channel) return res.status(404).json({ status: "NOT_FOUND", message: "Channel not found" });
+    let guild = await guilds.findOne({ gid: channel.gid });
+    if (!guild) return res.status(404).json({ status: "NOT_FOUND", message: "Guild not found" });
+    if (guild.members.find(guildMemberObj => guildMemberObj.user === req.cableAuth.uid) === undefined) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+
+    let channelMessage = channel.messages.find(channelMessageObj => channelMessageObj.id === parseInt(mid));
+    if (!channelMessage) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in channel" });
+
+    if (channelMessage.author !== req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
+
+    let ret = await channels.updateOne({ "messages.id": parseInt(mid) }, {
+        $set: {
+            "messages.$.content": newContent
+        }
+    });
+
+    res.status(204).end();
 });
 
 api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) => {
@@ -394,6 +416,8 @@ api.delete("/v1/channels/:cid/messages/:mid", authMiddleware, async (req, res) =
 
     let channelMessage = channel.messages.find(channelMessageObj => channelMessageObj.id === parseInt(mid));
     if (!channelMessage) return res.status(404).json({ status: "NOT_FOUND", message: "Message not found in channel" });
+
+    if (channelMessage.author !== req.cableAuth.uid) return res.status(403).json({ status: "FORBIDDEN", message: "Missing access" });
 
     let ret = await channels.updateOne({ id: parseInt(cid) }, {
         $pull: {
@@ -443,11 +467,21 @@ api.get("/v1/users/@me/guilds", authMiddleware, async (req, res) => {
     let invalidToken = await invalidTokens.findOne({ token: req.cableAuth.rawToken });
     if (invalidToken) return res.status(403).json({ status: "FORBIDDEN", message: "Session is invalidated" });
 
-    let users = db.collection("users");
+    let guilds = db.collection("guilds");
 
-    let user = await users.findOne({ id: req.cableAuth.uid });
+    let allGuilds = await guilds.find().toArray();
 
-    res.json(user.guilds);
+    let memberGuilds = [];
+
+    allGuilds.forEach(guild => {
+        if (guild.members.find(guildMemberObj => guildMemberObj.user === req.cableAuth.uid) !== undefined)
+        {
+            delete guild.members;
+            memberGuilds.push(guild);
+        }
+    });
+
+    res.json(memberGuilds);
 });
 
 api.delete("/v1/users/@me/guilds/:gid", authMiddleware, async (req, res) => {
