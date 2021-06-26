@@ -59,44 +59,39 @@ api.post("/v1/auth/login", async (req, res) => {
 
     let user = await users.findOne({ username: req.body.login });
 
-    if (user)
-    {
-        console.log(req.body.password);
-        console.log(user.password);
-        bcrypt.compare(req.body.password, user.password, (err, ret) => {
-            if (err) throw err;
+    if (!user) res.status(400).json({ status: "BAD_REQUEST" });
 
-            if (ret)
-            {
-                let data = {
-                    uid: user.id,
-                    apiVersion: "v1"
-                };
+    console.log(req.body.password);
+    console.log(user.password);
+    bcrypt.compare(req.body.password, user.password, (err, ret) => {
+        if (err) throw err;
 
-                let token = jwt.sign(data, process.env.JWT_SECRET, {
-                    expiresIn: "30m"
-                });
+        if (ret)
+        {
+            let data = {
+                uid: user.id,
+                apiVersion: "v1"
+            };
 
-                let refreshData = {
-                    uid: user.id,
-                    token: token,
-                    apiVersion: "v1"
-                };
+            let token = jwt.sign(data, process.env.JWT_SECRET, {
+                expiresIn: "30m"
+            });
 
-                let refreshToken = jwt.sign(refreshData, process.env.JWT_REFRESH_SECRET);
+            let refreshData = {
+                uid: user.id,
+                token: token,
+                apiVersion: "v1"
+            };
 
-                res.json({ status: "OK", token: token, refreshToken: refreshToken });
-            }
-            else
-            {
-                res.status(403).json({ status: "FORBIDDEN" });
-            }
-        });
-    }
-    else
-    {
-        res.status(400).json({ status: "BAD_REQUEST" });
-    }
+            let refreshToken = jwt.sign(refreshData, process.env.JWT_REFRESH_SECRET);
+
+            res.json({ status: "OK", token: token, refreshToken: refreshToken });
+        }
+        else
+        {
+            res.status(403).json({ status: "FORBIDDEN" });
+        }
+    });
 });
 
 api.delete("/v1/auth/logout", authMiddleware, async (req, res) => {
@@ -235,18 +230,13 @@ api.get("/v1/guilds/:id/channels", authMiddleware, async (req, res) => {
 
     let guild = await guilds.findOne({ gid: parseInt(gid) });
 
-    if (guild)
-    {
-        let guildChannels = await channels.find({ gid: parseInt(gid) }).toArray();
-        guildChannels.forEach(guildChannel => {
-            delete guildChannel.messages;
-        });
-        res.json(guildChannels);
-    }
-    else
-    {
-        return res.status(404).json({ status: "NOT_FOUND", message: "Guild non-existant" });
-    }
+    if (!guild) return res.status(404).json({ status: "NOT_FOUND", message: "Guild non-existant" });
+    
+    let guildChannels = await channels.find({ gid: parseInt(gid) }).toArray();
+    guildChannels.forEach(guildChannel => {
+        delete guildChannel.messages;
+    });
+    res.json(guildChannels);
 });
 
 // Channel endpoints
