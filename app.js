@@ -238,6 +238,9 @@ api.get("/v1/guilds/:id/channels", authMiddleware, async (req, res) => {
     if (guild)
     {
         let guildChannels = await channels.find({ gid: parseInt(gid) }).toArray();
+        guildChannels.forEach(guildChannel => {
+            delete guildChannel.messages;
+        });
         res.json(guildChannels);
     }
     else
