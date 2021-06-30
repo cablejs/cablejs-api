@@ -2,9 +2,13 @@
 
 require("dotenv").config();
 
+const http = require("http");
 const express = require("express");
 const api = express();
+const authMiddleware = require("./middleware/auth");
 const cors = require("./middleware/cors");
+
+let server = http.createServer(api);
 
 api.use(express.json());
 const textMiddleware = require("plaintextparser");
@@ -19,10 +23,10 @@ const client = new MongoClient(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+const io = require("socket.io")(server);
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const authMiddleware = require("./middleware/auth");
 
 process.stdin.setEncoding('utf8');
 
@@ -565,7 +569,7 @@ api.get("*", (_, res) => {
     res.status(404).json({ status: "NOT_FOUND" });
 });
 
-api.listen(3000, () => {
+server.listen(3000, () => {
     console.log("Ready");
     try
     {
